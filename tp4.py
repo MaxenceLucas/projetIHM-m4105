@@ -19,14 +19,18 @@ except:
 ################################################################################
 # GLOBAL VARS
 
-camera          = _cam.camera([0, 0, 10], [0, 0, 0])#main camera
+camera          = _cam.camera([0, 0, 1], [0, 0, 0])#main camera
 starting_time   = time.time()                       #starting time of course
 mouse           = [0, 0]                            #mouse current position
 animation       = False                             #(des)activating animation (juste for fun)
 spheres         = []                                #list of the spheres to select
 
 #  VARS GLOBAL PROJET
-RAYON = 0.5
+RADIUS_CIRCLE = 0.5
+RADIUS_SPHERE = 0.1
+IND_POINTING_SPHERE = 0
+IND_CURRENT_POINTING_SPHERE = 0
+SPHERE_CLICKED = False
 ################################################################################
 # SETUPS
 
@@ -64,18 +68,11 @@ def create_spheres():
     '''Create the spheres to select: 3d position and radius
     '''
     #TODO_TODO_TODO
-    s = []
-    '''
-    for i in range(10):
-        sphere = [random.uniform(-3.5,3.5),random.uniform(-3.5,3.5),random.uniform(-3.5,3.5)]
-        radius = random.uniform(0.5,1)
-        s.append(_sph.sphere(sphere, radius))'''
     global RAYON
+    s = []  
     for i in range(10):
-        glPushMatrix()
-        glTranslate(RAYON*math.sin(math.pi*2*i/10), RAYON*math.cos(math.pi*2*i/10), 0]
-        glutSolidSphere(rayon, 50, 10)
-        glPopMatrix()
+        posSphere = [RADIUS_CIRCLE*math.sin(math.pi*2*i/10), RADIUS_CIRCLE*math.cos(math.pi*2*i/10), 0]
+        s.append(_sph.sphere(posSphere, RADIUS_SPHERE))
 
     return s
 
@@ -121,11 +118,19 @@ def display_scene(sphs):
     #TODO_TODO_TODO
     #TODO_TODO_TODO
     #TODO_TODO_TODO
+    i = 1
     for sphere in sphs:
+        if IND_POINTING_SPHERE == i:
+            glColor(1, 0, 0, 1)
+        else:
+            glColor(0.5, 0.5, 0.5, 1)
+            
         glPushMatrix()
         glTranslate(*sphere.position)
         glutSolidSphere(sphere.radius,10,10)
         glPopMatrix()
+        i += 1
+    
     
 
 
@@ -179,10 +184,8 @@ def display():
     display_frame()
     display_scene(spheres)
     
-    ind = closest_sphere(spheres, camera, mouse)
-    print(ind)
-    display_bubble(spheres[ind], mouse, [0, 2, 0, .2])
-    
+    IND_CURRENT_POINTING_SPHERE = closest_sphere(spheres, camera, mouse) + 1
+    display_bubble(spheres[IND_CURRENT_POINTING_SPHERE - 1], mouse, [0, 2, 0, .2])
     glutSwapBuffers()
 
 
@@ -261,7 +264,25 @@ def mouse_passive(x, y):
     mouse =[x, y]
     glutPostRedisplay()
 
-
+###############################################################################
+# PROJET AJOUT 
+def randomizePointedSphere():
+    global IND_POINTING_SPHERE
+    global SPHERE_CLICKED
+    if IND_POINTING_SPHERE == 0 or SPHERE_CLICKED == TRUE:
+        IND_POINTING_SPHERE = random.randint(1, 10)
+        SPHERE_CLICKED = False
+        
+    
+def interactions():
+    randomizePointedSphere()
+    global SPHERE_CLICKED
+    global IND_POINTING_SPHERE
+    if IND_CURRENT_POINTING_SPHERE == IND_POINTING_SPHERE:
+        SPHERE_CLICKED = True
+        
+    print("ca passe")
+    
 ################################################################################
 # MAIN
 
@@ -276,6 +297,10 @@ glutInitWindowPosition (0, 0)
 glutCreateWindow(b'Bubble')
 
 setupScene()
+
+######
+interactions()
+#####
 
 glutDisplayFunc(display)
 glutReshapeFunc(reshape_persp)
