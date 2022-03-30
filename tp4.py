@@ -25,6 +25,8 @@ mouse           = [0, 0]                            #mouse current position
 animation       = False                             #(des)activating animation (juste for fun)
 spheres         = []                                #list of the spheres to select
 
+#  VARS GLOBAL PROJET
+RAYON = 0.5
 ################################################################################
 # SETUPS
 
@@ -63,10 +65,17 @@ def create_spheres():
     '''
     #TODO_TODO_TODO
     s = []
+    '''
     for i in range(10):
         sphere = [random.uniform(-3.5,3.5),random.uniform(-3.5,3.5),random.uniform(-3.5,3.5)]
         radius = random.uniform(0.5,1)
-        s.append(_sph.sphere(sphere, radius))
+        s.append(_sph.sphere(sphere, radius))'''
+    global RAYON
+    for i in range(10):
+        glPushMatrix()
+        glTranslate(RAYON*math.sin(math.pi*2*i/10), RAYON*math.cos(math.pi*2*i/10), 0]
+        glutSolidSphere(rayon, 50, 10)
+        glPopMatrix()
 
     return s
 
