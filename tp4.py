@@ -28,6 +28,7 @@ animation       = False                             #(des)activating animation (
 spheres         = []                                #list of the spheres to select
 
 #  VARS GLOBAL PROJET
+NB_CLICK = 0
 CLICKS = []
 RADIUS_CIRCLE = 0.5
 RADIUS_SPHERE = 0.1
@@ -191,7 +192,7 @@ def display():
     IND_CURRENT_POINTING_SPHERE = closest_sphere(spheres, camera, mouse)
     display_bubble(spheres[IND_CURRENT_POINTING_SPHERE], mouse, [0, 2, 0, .2])
     #interactions()
-    print(SPHERE_CLICKED)
+    #print(SPHERE_CLICKED)
     glutSwapBuffers()
 
 
@@ -251,6 +252,8 @@ def mouse_clicks(button, state, x, y):
     state is in [GLUT_DOWN, GLUT_UP]
     '''
     global mouse
+    global NB_CLICK
+    NB_CLICK += 1
     mouse = [x, y]
     interactionsNearest()
     glutPostRedisplay()
@@ -278,7 +281,9 @@ def randomizePointedSphere():
     global SPHERE_CLICKED
     global SEQUENCE_CURRENT_IND
     global SEQUENCE_IND
-    if SPHERE_CLICKED == True:
+    global NB_CLICK
+
+    if SPHERE_CLICKED == True and NB_CLICK%2==0:
         
         IND_POINTING_SPHERE = SEQUENCE_IND[SEQUENCE_CURRENT_IND]
         SPHERE_CLICKED = False
@@ -296,7 +301,7 @@ def interactionsNearest():
     else:
         CLICKS.append(False)
     SPHERE_CLICKED = True
-    print(IND_CURRENT_POINTING_SPHERE, IND_POINTING_SPHERE)
+    #print(IND_CURRENT_POINTING_SPHERE, IND_POINTING_SPHERE)
     randomizePointedSphere()
 
 def interactionsOnSphere():
