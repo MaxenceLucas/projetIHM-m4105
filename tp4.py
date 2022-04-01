@@ -33,7 +33,9 @@ RADIUS_CIRCLE = 0.5
 RADIUS_SPHERE = 0.1
 IND_POINTING_SPHERE = 0
 IND_CURRENT_POINTING_SPHERE = 0
-SPHERE_CLICKED = False
+SPHERE_CLICKED = True
+SEQUENCE_IND = [2, 6, 0, 4, 8, 3, 9, 5, 1, 7]
+SEQUENCE_CURRENT_IND = 0
 ################################################################################
 # SETUPS
 
@@ -53,7 +55,7 @@ def setupScene():
     glEnable(GL_CULL_FACE)
     glShadeModel(GL_SMOOTH)
     glEnable(GL_BLEND)
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     glEnable(GL_NORMALIZE)
     glEnable(GL_COLOR_MATERIAL)
     glColorMaterial(GL_FRONT,GL_AMBIENT_AND_DIFFUSE)
@@ -120,10 +122,10 @@ def display_scene(sphs):
     #TODO_TODO_TODO
     #TODO_TODO_TODO
     #TODO_TODO_TODO
-    i = 1
+    i = 0
     for sphere in sphs:
         if IND_POINTING_SPHERE == i:
-            glColor(1, 0, 0, 1)
+            glColor(0, 1, 0, 1)
         else:
             glColor(0.5, 0.5, 0.5, 1)
             
@@ -186,8 +188,8 @@ def display():
     display_frame()
     display_scene(spheres)
     global IND_CURRENT_POINTING_SPHERE
-    IND_CURRENT_POINTING_SPHERE = closest_sphere(spheres, camera, mouse) + 1
-    display_bubble(spheres[IND_CURRENT_POINTING_SPHERE - 1], mouse, [0, 2, 0, .2])
+    IND_CURRENT_POINTING_SPHERE = closest_sphere(spheres, camera, mouse)
+    display_bubble(spheres[IND_CURRENT_POINTING_SPHERE], mouse, [0, 2, 0, .2])
     #interactions()
     print(SPHERE_CLICKED)
     glutSwapBuffers()
@@ -274,10 +276,16 @@ def mouse_passive(x, y):
 def randomizePointedSphere():
     global IND_POINTING_SPHERE
     global SPHERE_CLICKED
-    if IND_POINTING_SPHERE == 0 or SPHERE_CLICKED == True:
-        IND_POINTING_SPHERE = random.randint(1, 10)
+    global SEQUENCE_CURRENT_IND
+    global SEQUENCE_IND
+    if SPHERE_CLICKED == True:
+        
+        IND_POINTING_SPHERE = SEQUENCE_IND[SEQUENCE_CURRENT_IND]
         SPHERE_CLICKED = False
-        print("ca passe") 
+        SEQUENCE_CURRENT_IND += 1
+        if SEQUENCE_CURRENT_IND > 9:
+            SEQUENCE_CURRENT_IND = 0
+        
         
     
 def interactionsNearest():
@@ -295,16 +303,22 @@ def interactionsOnSphere():
     global SPHERE_CLICKED
     global IND_POINTING_SPHERE
     global mouse
-    if IND_CURRENT_POINTING_SPHERE == IND_POINTING_SPHERE:
+    if clickOnSphere(mouse,IND_POINTING_SPHERE):
         CLICKS.append(True)
     else:
         CLICKS.append(False)
     SPHERE_CLICKED = True
-    print(IND_CURRENT_POINTING_SPHERE, IND_POINTING_SPHERE)
     randomizePointedSphere()
 
-#def clickOnSphere(mouse):
-#    math.hypot(mouse[0]-sphere)
+def clickOnSphere(mouse,indexSphere):
+    global spheres
+    global camera
+    sph = spheres[indexSphere].project(camera) 
+    hyp = math.hypot(sph.pos[0][0]-mouse[0], sph.pos[0][0]-mouse[1])
+    if (hyp < sph[1]):
+        return True
+    else:
+        return False
 
     
     
