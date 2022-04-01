@@ -5,6 +5,8 @@ import time
 import math
 import random
 
+from sympy import true
+
 import libs.camera      as _cam
 import libs.sphere      as _sph
 import libs.geometry    as _geo
@@ -26,6 +28,7 @@ animation       = False                             #(des)activating animation (
 spheres         = []                                #list of the spheres to select
 
 #  VARS GLOBAL PROJET
+CLICKS = []
 RADIUS_CIRCLE = 0.5
 RADIUS_SPHERE = 0.1
 IND_POINTING_SPHERE = 0
@@ -185,7 +188,7 @@ def display():
     global IND_CURRENT_POINTING_SPHERE
     IND_CURRENT_POINTING_SPHERE = closest_sphere(spheres, camera, mouse) + 1
     display_bubble(spheres[IND_CURRENT_POINTING_SPHERE - 1], mouse, [0, 2, 0, .2])
-    interactions()
+    #interactions()
     print(SPHERE_CLICKED)
     glutSwapBuffers()
 
@@ -247,6 +250,7 @@ def mouse_clicks(button, state, x, y):
     '''
     global mouse
     mouse = [x, y]
+    interactionsNearest()
     glutPostRedisplay()
 
 
@@ -276,13 +280,32 @@ def randomizePointedSphere():
         print("ca passe") 
         
     
-def interactions():
+def interactionsNearest():
     global SPHERE_CLICKED
     global IND_POINTING_SPHERE
     if IND_CURRENT_POINTING_SPHERE == IND_POINTING_SPHERE:
-        SPHERE_CLICKED = True
+        CLICKS.append(True)
+    else:
+        CLICKS.append(False)
+    SPHERE_CLICKED = True
     print(IND_CURRENT_POINTING_SPHERE, IND_POINTING_SPHERE)
     randomizePointedSphere()
+
+def interactionsOnSphere():
+    global SPHERE_CLICKED
+    global IND_POINTING_SPHERE
+    global mouse
+    if IND_CURRENT_POINTING_SPHERE == IND_POINTING_SPHERE:
+        CLICKS.append(True)
+    else:
+        CLICKS.append(False)
+    SPHERE_CLICKED = True
+    print(IND_CURRENT_POINTING_SPHERE, IND_POINTING_SPHERE)
+    randomizePointedSphere()
+
+#def clickOnSphere(mouse):
+#    math.hypot(mouse[0]-sphere)
+
     
     
 ################################################################################
