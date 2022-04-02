@@ -34,7 +34,6 @@ RADIUS_CIRCLE = 0
 RADIUS_SPHERE = 0
 IND_POINTING_SPHERE = 0
 IND_CURRENT_POINTING_SPHERE = 0
-SPHERE_CLICKED = True
 SEQUENCE_IND = [2, 6, 0, 4, 8, 3, 9, 5, 1, 7]
 SEQUENCE_CURRENT_IND = 0
 NB_SEQUENCE_IDS = 1                             #5 sequence pour chaque ID par technique
@@ -69,8 +68,6 @@ def setupScene():
     glColorMaterial(GL_FRONT,GL_AMBIENT_AND_DIFFUSE)
     glEnable(GL_DEPTH_TEST)
     glClearColor(.4, .4, .4, 1)
-    
-    defineID()
     global spheres
     spheres = create_spheres()
 
@@ -288,54 +285,45 @@ def mouse_passive(x, y):
 # PROJET AJOUT 
 def randomizePointedSphere():
     global IND_POINTING_SPHERE
-    global SPHERE_CLICKED
     global SEQUENCE_CURRENT_IND
     global SEQUENCE_IND
     global NEW_ID
     global NB_CLICK
     global CLICK
 
-    if SPHERE_CLICKED == True and CLICK == True and IND_POINTING_SPHERE == IND_CURRENT_POINTING_SPHERE :
+    if CLICK == True and IND_POINTING_SPHERE == IND_CURRENT_POINTING_SPHERE :
         IND_POINTING_SPHERE = SEQUENCE_IND[SEQUENCE_CURRENT_IND]
-        SPHERE_CLICKED = False
         SEQUENCE_CURRENT_IND += 1
         if SEQUENCE_CURRENT_IND > 9:
             SEQUENCE_CURRENT_IND = 0
-            NEW_ID = True
+            defineID()
         
 def defineID():
-    global NEW_ID
     global RADIUS_CIRCLE
     global RADIUS_SPHERE
     global spheres
     global ID_TODO
     global NB_SEQUENCE_IDS
-    if NEW_ID == True:
-        switcher = {
-            0: IDS[0],
-            1: IDS[1],
-            2: IDS[2],
-        }
-        randomID = random.choice(ID_TODO)
-        ID_TODO.remove(randomID)
-        ind_radius = switcher.get(randomID)
-        RADIUS_CIRCLE = ind_radius[0]
-        RADIUS_SPHERE = ind_radius[1]
-        NEW_ID = False
-        spheres = create_spheres()
+ 
+    randomID = random.choice(ID_TODO)
+    ID_TODO.remove(randomID)
+    ind_radius = IDS[randomID]
+    RADIUS_CIRCLE = ind_radius[0]
+    RADIUS_SPHERE = ind_radius[1]
+    spheres = create_spheres()
     if len(ID_TODO) == 0:
         ID_TODO = [0, 1, 2]
         NB_SEQUENCE_IDS += 1
+        newTechnique()
 
 def newTechnique():       
     global ID_TODO
     global TECHNIQUE
-    if NB_SEQUENCE_IDS == 5:
+    if NB_SEQUENCE_IDS > 1:
         TECHNIQUE = "normale" if TECHNIQUE == "bubble" else "bubble"
 
   
 def interactionsNearest():
-    global SPHERE_CLICKED
     '''
     global IND_POINTING_SPHERE
     if IND_CURRENT_POINTING_SPHERE == IND_POINTING_SPHERE:
@@ -344,11 +332,8 @@ def interactionsNearest():
     else:
         CLICKS.append(False)
     '''
-    SPHERE_CLICKED = True
     #print(IND_CURRENT_POINTING_SPHERE, IND_POINTING_SPHERE)
     randomizePointedSphere()
-    newTechnique()
-    defineID()
 '''
 def interactionsOnSphere():
     global SPHERE_CLICKED
@@ -402,6 +387,8 @@ def enregistrementDonees(datas):
 print("Commands:")
 print("\ta:\tanimation")
 print("\tesc:\texit")
+# initialisation
+defineID()
 enregistrementDonees([['Maxence', 'BUBLE', '5', '2', '0'], ['CELIAN', 'BUBLE', '5', '2', '0']])
 
 glutInit(sys.argv)
