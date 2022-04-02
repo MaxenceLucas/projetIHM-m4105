@@ -30,16 +30,20 @@ spheres         = []                                #list of the spheres to sele
 #  VARS GLOBAL PROJET
 NB_CLICK = 0
 CLICKS = []
-RADIUS_CIRCLE = 0.5
-RADIUS_SPHERE = 0.1
+RADIUS_CIRCLE = 0
+RADIUS_SPHERE = 0
 IND_POINTING_SPHERE = 0
 IND_CURRENT_POINTING_SPHERE = 0
 SPHERE_CLICKED = True
 SEQUENCE_IND = [2, 6, 0, 4, 8, 3, 9, 5, 1, 7]
 SEQUENCE_CURRENT_IND = 0
-IDS = [[3.5, 0.5], [3.75, 0.25], [4.65, 0.15]]#ID[RAYON grande cercle, rayon Sphere] | ordre => 3, 4, 5 | formule => ID = log2((De/WE) +1) => ID = log2(2^ID)
+NB_SEQUENCE_IDS = 1                             #5 sequence pour chaque ID par technique
+IDS = [[3.5, 0.5], [3.75, 0.25], [4.65, 0.15]]  #ID[RAYON grande cercle, rayon Sphere] | ordre => 3, 4, 5 | formule => ID = log2((De/WE) +1) => ID = log2(2^ID)
 NEW_ID = True
+ID_TODO = [0, 1, 2] #3, 4, 5
 CLICK = False
+TECHNIQUE = "normale" if random.randint(1, 2) == 1 else "bubble"   
+SPHERE_CLICKED_CORRECT = False                                
 ################################################################################
 # SETUPS
 
@@ -179,7 +183,8 @@ def display_bubble(sphere, pos_2d, color):
 def display():
     '''Global Display function
     '''
-    
+    global TECHNIQUE
+
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glLoadIdentity ()             # clear the matrix 
     
@@ -195,7 +200,7 @@ def display():
     display_scene(spheres)
     global IND_CURRENT_POINTING_SPHERE
     IND_CURRENT_POINTING_SPHERE = closest_sphere(spheres, camera, mouse)
-    display_bubble(spheres[IND_CURRENT_POINTING_SPHERE], mouse, [0, 2, 0, .2])
+    display_bubble(spheres[IND_CURRENT_POINTING_SPHERE], mouse, [0, 2, 0, .2]) if TECHNIQUE == "bubble" else ''
     glutSwapBuffers()
 
 
@@ -257,7 +262,7 @@ def mouse_clicks(button, state, x, y):
     global mouse
     #global NB_CLICK
     global CLICK
-    CLICK = not(CLICK)
+    CLICK = not(CLICK)      #True quand presser et faux quand
     #NB_CLICK += 1
     mouse = [x, y]
     interactionsNearest()
@@ -303,19 +308,31 @@ def defineID():
     global RADIUS_CIRCLE
     global RADIUS_SPHERE
     global spheres
+    global ID_TODO
+    global NB_SEQUENCE_IDS
     if NEW_ID == True:
         switcher = {
             0: IDS[0],
             1: IDS[1],
             2: IDS[2],
         }
-        ind_radius = switcher.get(random.randint(0, 2))
+        randomID = random.choice(ID_TODO)
+        ID_TODO.remove(randomID)
+        ind_radius = switcher.get(randomID)
         RADIUS_CIRCLE = ind_radius[0]
         RADIUS_SPHERE = ind_radius[1]
         NEW_ID = False
         spheres = create_spheres()
+    if len(ID_TODO) == 0:
+        ID_TODO = [0, 1, 2]
+        NB_SEQUENCE_IDS += 1
 
-       
+def newTechnique():       
+    global ID_TODO
+    global TECHNIQUE
+    if NB_SEQUENCE_IDS == 5:
+        TECHNIQUE = "normale" if TECHNIQUE == "bubble" else "bubble"
+
   
 def interactionsNearest():
     global SPHERE_CLICKED
@@ -330,6 +347,7 @@ def interactionsNearest():
     SPHERE_CLICKED = True
     #print(IND_CURRENT_POINTING_SPHERE, IND_POINTING_SPHERE)
     randomizePointedSphere()
+    newTechnique()
     defineID()
 '''
 def interactionsOnSphere():
@@ -342,7 +360,7 @@ def interactionsOnSphere():
         CLICKS.append(False)
     SPHERE_CLICKED = True
     randomizePointedSphere()
-
+'''
 def clickOnSphere(mouse,indexSphere):
     global spheres
     global camera
@@ -352,7 +370,19 @@ def clickOnSphere(mouse,indexSphere):
         return True
     else:
         return False
-'''    
+
+def applyPointageTechnique():
+    global TECHNIQUE
+    global IND_CURRENT_POINTING_SPHERE
+    global IND_POINTING_SPHERE
+    global mouse
+    if TECHNIQUE == "bubble":
+        IND_CURRENT_POINTING_SPHERE == closest_sphere(spheres, camera, mouse)
+        display_bubble(spheres[IND_CURRENT_POINTING_SPHERE], mouse, [0, 2, 0, .2])
+        
+    else:
+        SPHERE_CLICKED_CORRECT = clickOnSphere(mouse, IND_POINTING_SPHERE)
+
 
 ###############################
 ### ENREGISTREMENT DONNEES DANS FICHIER CSV
