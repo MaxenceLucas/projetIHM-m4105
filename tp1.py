@@ -28,7 +28,7 @@ def display():
         glVertex(RAYON*math.sin(math.pi*2*i/NBCOTE),RAYON*math.cos(math.pi*2*i/NBCOTE),0)
     glEnd()
     glPopMatrix()
-
+    glutSolidSphere(1, 100, 100)
     glutSwapBuffers()
 
 def idle():

@@ -2,8 +2,8 @@
 
 import sys
 import time
-import math
-import random
+import math, random
+import csv
 
 #from sympy import true
 
@@ -21,7 +21,7 @@ except:
 ################################################################################
 # GLOBAL VARS
 
-camera          = _cam.camera([0, 0, 2], [0, 0, 0])#main camera
+camera          = _cam.camera([0, 0, 9], [0, 0, 0])#main camera
 starting_time   = time.time()                       #starting time of course
 mouse           = [0, 0]                            #mouse current position
 animation       = False                             #(des)activating animation (juste for fun)
@@ -37,8 +37,9 @@ IND_CURRENT_POINTING_SPHERE = 0
 SPHERE_CLICKED = True
 SEQUENCE_IND = [2, 6, 0, 4, 8, 3, 9, 5, 1, 7]
 SEQUENCE_CURRENT_IND = 0
-IDS = [[0.7, 0.05], [0.5, 0.1], [0.4, 0.3]]#ID[RAYON grande cercle, rayon Sphere]
+IDS = [[3.5, 0.5], [3.75, 0.25], [4.65, 0.15]]#ID[RAYON grande cercle, rayon Sphere] | ordre => 3, 4, 5 | formule => ID = log2((De/WE) +1) => ID = log2(2^ID)
 NEW_ID = True
+CLICK = False
 ################################################################################
 # SETUPS
 
@@ -65,6 +66,7 @@ def setupScene():
     glEnable(GL_DEPTH_TEST)
     glClearColor(.4, .4, .4, 1)
     
+    defineID()
     global spheres
     spheres = create_spheres()
 
@@ -137,6 +139,7 @@ def display_scene(sphs):
         glutSolidSphere(sphere.radius,10,10)
         glPopMatrix()
         i += 1
+    
     
     
 
@@ -252,8 +255,10 @@ def mouse_clicks(button, state, x, y):
     state is in [GLUT_DOWN, GLUT_UP]
     '''
     global mouse
-    global NB_CLICK
-    NB_CLICK += 1
+    #global NB_CLICK
+    global CLICK
+    CLICK = not(CLICK)
+    #NB_CLICK += 1
     mouse = [x, y]
     interactionsNearest()
     glutPostRedisplay()
@@ -283,16 +288,15 @@ def randomizePointedSphere():
     global SEQUENCE_IND
     global NEW_ID
     global NB_CLICK
+    global CLICK
 
-    if SPHERE_CLICKED == True and NB_CLICK%2==0:
-        
+    if SPHERE_CLICKED == True and CLICK == True and IND_POINTING_SPHERE == IND_CURRENT_POINTING_SPHERE :
         IND_POINTING_SPHERE = SEQUENCE_IND[SEQUENCE_CURRENT_IND]
         SPHERE_CLICKED = False
         SEQUENCE_CURRENT_IND += 1
         if SEQUENCE_CURRENT_IND > 9:
             SEQUENCE_CURRENT_IND = 0
             NEW_ID = True
-            print("passe squence")
         
 def defineID():
     global NEW_ID
@@ -311,21 +315,23 @@ def defineID():
         NEW_ID = False
         spheres = create_spheres()
 
-            
-    
+       
+  
 def interactionsNearest():
     global SPHERE_CLICKED
+    '''
     global IND_POINTING_SPHERE
     if IND_CURRENT_POINTING_SPHERE == IND_POINTING_SPHERE:
     
         CLICKS.append(True)
     else:
         CLICKS.append(False)
+    '''
     SPHERE_CLICKED = True
     #print(IND_CURRENT_POINTING_SPHERE, IND_POINTING_SPHERE)
     randomizePointedSphere()
     defineID()
-
+'''
 def interactionsOnSphere():
     global SPHERE_CLICKED
     global IND_POINTING_SPHERE
@@ -346,7 +352,19 @@ def clickOnSphere(mouse,indexSphere):
         return True
     else:
         return False
-    
+'''    
+
+###############################
+### ENREGISTREMENT DONNEES DANS FICHIER CSV
+
+#data prends un tableau de x structures de données
+def enregistrementDonees(datas):
+    #STRUCTURE: NOM UTILISATEUR, NOM TECHNIQUE, ID POINTAGE, [TEMPS POINTAGE], ERREURS
+    f = open('data.csv', 'a')
+    writer = csv.writer(f, delimiter=' ')
+    for data in datas:
+        writer.writerow(data)
+    f.close()
     
 ################################################################################
 # MAIN
@@ -354,6 +372,7 @@ def clickOnSphere(mouse,indexSphere):
 print("Commands:")
 print("\ta:\tanimation")
 print("\tesc:\texit")
+enregistrementDonees([['Maxence', 'BUBLE', '5', '2', '0'], ['CELIAN', 'BUBLE', '5', '2', '0']])
 
 glutInit(sys.argv)
 glutInitDisplayString(b'double rgba depth')
@@ -362,10 +381,6 @@ glutInitWindowPosition (0, 0)
 glutCreateWindow(b'Bubble')
 
 setupScene()
-
-######
-
-#####
 
 glutDisplayFunc(display)
 glutReshapeFunc(reshape_persp)
