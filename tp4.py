@@ -33,6 +33,8 @@ IND_CURRENT_POINTING_SPHERE = 0
 SPHERE_CLICKED = True
 SEQUENCE_IND = [2, 6, 0, 4, 8, 3, 9, 5, 1, 7]
 SEQUENCE_CURRENT_IND = 0
+IDS = [[0.7, 0.05], [0.5, 0.1], [0.4, 0.3]]#ID[RAYON grande cercle, rayon Sphere]
+NEW_ID = True
 ################################################################################
 # SETUPS
 
@@ -188,7 +190,6 @@ def display():
     IND_CURRENT_POINTING_SPHERE = closest_sphere(spheres, camera, mouse)
     display_bubble(spheres[IND_CURRENT_POINTING_SPHERE], mouse, [0, 2, 0, .2])
     interactions()
-    print(SPHERE_CLICKED)
     glutSwapBuffers()
 
 
@@ -274,6 +275,7 @@ def randomizePointedSphere():
     global SPHERE_CLICKED
     global SEQUENCE_CURRENT_IND
     global SEQUENCE_IND
+    global NEW_ID
     if SPHERE_CLICKED == True:
         
         IND_POINTING_SPHERE = SEQUENCE_IND[SEQUENCE_CURRENT_IND]
@@ -281,16 +283,36 @@ def randomizePointedSphere():
         SEQUENCE_CURRENT_IND += 1
         if SEQUENCE_CURRENT_IND > 9:
             SEQUENCE_CURRENT_IND = 0
+            NEW_ID = True
+            print("passe squence")
         
-        
+def defineID():
+    global NEW_ID
+    global RADIUS_CIRCLE
+    global RADIUS_SPHERE
+    global spheres
+    if NEW_ID == True:
+        switcher = {
+            0: IDS[0],
+            1: IDS[1],
+            2: IDS[2],
+        }
+        ind_radius = switcher.get(random.randint(0, 2))
+        RADIUS_CIRCLE = ind_radius[0]
+        RADIUS_SPHERE = ind_radius[1]
+        NEW_ID = False
+        spheres = create_spheres()
+
+            
     
 def interactions():
     global SPHERE_CLICKED
     global IND_POINTING_SPHERE
     if IND_CURRENT_POINTING_SPHERE == IND_POINTING_SPHERE:
         SPHERE_CLICKED = True
-    print(IND_CURRENT_POINTING_SPHERE, IND_POINTING_SPHERE)
     randomizePointedSphere()
+    defineID()
+    
     
     
 ################################################################################
