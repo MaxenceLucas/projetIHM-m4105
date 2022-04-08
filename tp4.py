@@ -1,5 +1,6 @@
 ﻿#!/usr/bin/env python3
 
+import string
 import sys
 import time
 import math, random
@@ -29,7 +30,7 @@ spheres         = []                                #list of the spheres to sele
 
 #  VARS GLOBAL PROJET
 NB_CLICK = 0
-CLICKS = []
+CLICKS = True
 RADIUS_CIRCLE = 0
 RADIUS_SPHERE = 0
 IND_POINTING_SPHERE = 0
@@ -42,7 +43,9 @@ NEW_ID = True
 ID_TODO = [0, 1, 2] #3, 4, 5
 CLICK = False
 TECHNIQUE = "normale" if random.randint(1, 2) == 1 else "bubble"   
-SPHERE_CLICKED_CORRECT = False                                
+SPHERE_CLICKED_CORRECT = False
+TIME = 0
+USER = ""                            
 ################################################################################
 # SETUPS
 
@@ -262,7 +265,7 @@ def mouse_clicks(button, state, x, y):
     CLICK = not(CLICK)      #True quand presser et faux quand
     #NB_CLICK += 1
     mouse = [x, y]
-    interactionsNearest()
+    applyPointageTechnique()
     glutPostRedisplay()
 
 
@@ -290,8 +293,16 @@ def randomizePointedSphere():
     global NEW_ID
     global NB_CLICK
     global CLICK
-
-    if CLICK == True and IND_POINTING_SPHERE == IND_CURRENT_POINTING_SPHERE :
+    global TIME
+    global ID_TODO
+    print("why")
+    if CLICK == True:
+        print("not")
+        glFinish()
+        sTime = glutGet(GLUT_ELAPSED_TIME)
+        temps = sTime - TIME #variable a récupérer pour le temps entre les deux click
+        #enregistrementDonees([USER, TECHNIQUE, ID_TODO, temps, CLICKS]) # TOUTES INFO A RENTRER / TODO: pas sur pour le ID
+        TIME = sTime
         IND_POINTING_SPHERE = SEQUENCE_IND[SEQUENCE_CURRENT_IND]
         SEQUENCE_CURRENT_IND += 1
         if SEQUENCE_CURRENT_IND > 9:
@@ -324,37 +335,26 @@ def newTechnique():
 
   
 def interactionsNearest():
-    '''
+    
     global IND_POINTING_SPHERE
     if IND_CURRENT_POINTING_SPHERE == IND_POINTING_SPHERE:
-    
-        CLICKS.append(True)
+        CLICKS = True
     else:
-        CLICKS.append(False)
-    '''
+        CLICKS = False
     #print(IND_CURRENT_POINTING_SPHERE, IND_POINTING_SPHERE)
     randomizePointedSphere()
-'''
-def interactionsOnSphere():
-    global SPHERE_CLICKED
-    global IND_POINTING_SPHERE
-    global mouse
-    if clickOnSphere(mouse,IND_POINTING_SPHERE):
-        CLICKS.append(True)
-    else:
-        CLICKS.append(False)
-    SPHERE_CLICKED = True
-    randomizePointedSphere()
-'''
+
 def clickOnSphere(mouse,indexSphere):
     global spheres
     global camera
-    sph = spheres[indexSphere].project(camera) 
-    hyp = math.hypot(sph.pos[0][0]-mouse[0], sph.pos[0][0]-mouse[1])
-    if (hyp < sph[1]):
-        return True
-    else:
-        return False
+    global CLICKS
+    sph = spheres[indexSphere].project(camera)
+    hyp = math.hypot(sph[0][0]-mouse[0], sph[0][1]-mouse[1])
+    if (hyp > sph[1]):
+        CLICKS = False
+    else :
+        CLICKS = True
+    randomizePointedSphere()
 
 def applyPointageTechnique():
     global TECHNIQUE
@@ -363,10 +363,13 @@ def applyPointageTechnique():
     global mouse
     if TECHNIQUE == "bubble":
         IND_CURRENT_POINTING_SPHERE == closest_sphere(spheres, camera, mouse)
+        
         display_bubble(spheres[IND_CURRENT_POINTING_SPHERE], mouse, [0, 2, 0, .2])
+        interactionsNearest()
+        print("test")
         
     else:
-        SPHERE_CLICKED_CORRECT = clickOnSphere(mouse, IND_POINTING_SPHERE)
+        clickOnSphere(mouse, IND_POINTING_SPHERE)
 
 
 ###############################
@@ -387,6 +390,8 @@ def enregistrementDonees(datas):
 print("Commands:")
 print("\ta:\tanimation")
 print("\tesc:\texit")
+print("le timer démarra à partir du premier click")
+USER = input("veuillez entrer votre nom :")
 # initialisation
 defineID()
 enregistrementDonees([['Maxence', 'BUBLE', '5', '2', '0'], ['CELIAN', 'BUBLE', '5', '2', '0']])
@@ -396,6 +401,8 @@ glutInitDisplayString(b'double rgba depth')
 glutInitWindowSize (800, 600)
 glutInitWindowPosition (0, 0)
 glutCreateWindow(b'Bubble')
+glFinish()
+TIME = glutGet(GLUT_ELAPSED_TIME)
 
 setupScene()
 

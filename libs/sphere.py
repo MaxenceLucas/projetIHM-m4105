@@ -19,10 +19,13 @@ class sphere:
         #TODO_TODO_TODO
         x = gluProject(*self.position,glGetDoublev(GL_MODELVIEW_MATRIX),glGetDoublev(GL_PROJECTION_MATRIX),glGetIntegerv(GL_VIEWPORT))
         self.proj_position = [x[0], x[1]]
+        ret = [x[0],glutGet(GLUT_WINDOW_HEIGHT)-x[1]]
+        x= [x[0],glutGet(GLUT_WINDOW_HEIGHT)-x[1],x[2]]
         y = [self.radius*camera.up[0],self.radius*camera.up[1],self.radius*camera.up[2]]
         rad = [x[0]+y[0],x[1]+y[1],x[2]+y[2]]
         rad = gluProject(*rad,glGetDoublev(GL_MODELVIEW_MATRIX),glGetDoublev(GL_PROJECTION_MATRIX),glGetIntegerv(GL_VIEWPORT))
+        
         self.proj_radius = math.hypot(rad[0]-x[0],rad[1]-x[1])
-        ret = [x[0],glutGet(GLUT_WINDOW_HEIGHT)-x[1]]
+        
         
         return ret , self.proj_radius
