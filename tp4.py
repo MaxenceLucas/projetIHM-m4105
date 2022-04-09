@@ -172,8 +172,11 @@ def display_bubble(sphere, pos_2d, color):
     #TODO_TODO_TODO
     global camera
     sph=sphere.project(camera)
-    #droite = [pos_2d[0]+sph[0][0],pos_2d[0]+sph[0][1]]
-    centre = [(pos_2d[0]+sph[0][0])/2,(pos_2d[1]+sph[0][1])/2]
+    triangle = [sph[0][0]-pos_2d[0],sph[0][1]-pos_2d[1]]
+    droite = math.hypot(abs(triangle[0]),abs(triangle[1]))
+    radx = sph[1]*(triangle[0]/droite)
+    rady = sph[1]*(triangle[1]/droite)
+    centre = [(pos_2d[0]+sph[0][0]+radx)/2,(pos_2d[1]+sph[0][1]+rady)/2]
     r = math.hypot(centre[0]-pos_2d[0],centre[1]-pos_2d[1])
     display_2d_disc(centre,r,color)
 
@@ -295,9 +298,7 @@ def randomizePointedSphere():
     global CLICK
     global TIME
     global ID_TODO
-    print("why")
     if CLICK == True:
-        print("not")
         glFinish()
         sTime = glutGet(GLUT_ELAPSED_TIME)
         temps = sTime - TIME #variable a récupérer pour le temps entre les deux click
@@ -337,6 +338,9 @@ def newTechnique():
 def interactionsNearest():
     
     global IND_POINTING_SPHERE
+    global IND_CURRENT_POINTING_SPHERE
+    global CLICKS
+    #print()
     if IND_CURRENT_POINTING_SPHERE == IND_POINTING_SPHERE:
         CLICKS = True
     else:
@@ -350,7 +354,6 @@ def clickOnSphere(mouse,indexSphere):
     global CLICKS
     sph = spheres[indexSphere].project(camera)
     hyp = math.hypot(sph[0][0]-mouse[0], sph[0][1]-mouse[1])
-    #print(sph[1])
     if (hyp > sph[1]):
         CLICKS = False
     else :
@@ -364,10 +367,8 @@ def applyPointageTechnique():
     global mouse
     if TECHNIQUE == "bubble":
         IND_CURRENT_POINTING_SPHERE == closest_sphere(spheres, camera, mouse)
-        
         display_bubble(spheres[IND_CURRENT_POINTING_SPHERE], mouse, [0, 2, 0, .2])
         interactionsNearest()
-        print("test")
         
     else:
         clickOnSphere(mouse, IND_POINTING_SPHERE)
