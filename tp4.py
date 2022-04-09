@@ -350,6 +350,7 @@ def clickOnSphere(mouse,indexSphere):
     global CLICKS
     sph = spheres[indexSphere].project(camera)
     hyp = math.hypot(sph[0][0]-mouse[0], sph[0][1]-mouse[1])
+    #print(sph[1])
     if (hyp > sph[1]):
         CLICKS = False
     else :
