@@ -264,9 +264,9 @@ def mouse_clicks(button, state, x, y):
     '''
     global mouse
     global CLICK
-    CLICK = not(CLICK)      #True quand presser et faux quand
+    CLICK = not(CLICK)      #permet de ne pas obtenir un "click" lorsqu'on lache lebouton de la souris
     mouse = [x, y]
-    applyPointageTechnique()
+    applyPointageTechnique()    #On cherche quel fonction utilisé en cas de clique
     glutPostRedisplay()
 
 
@@ -296,31 +296,31 @@ def NextPointedSphere():
     global TIME
     global CURRENT_ID
     global DATA
-    if NB_CLICK < 270:
-        if CLICK == True :
+    if NB_CLICK < 270:  #permet d'accéder a la fin  
+        if CLICK == True : #s'acctive que lors de la pression de la souris 
             glFinish()
-            sTime = glutGet(GLUT_ELAPSED_TIME)
-            if NB_CLICK == 0:
+            sTime = glutGet(GLUT_ELAPSED_TIME) # on récupère le temps actuel
+            if NB_CLICK == 0:   #si c'est la première sphère on initialise le temps 
                 glFinish()
                 TIME = glutGet(GLUT_ELAPSED_TIME)
                 temps = 0
-            else:
+            else:   #sinon on calcule l'intervale entre les deux valeur de temps
                 temps = sTime - TIME #variable a récupérer pour le temps entre les deux click
-                TIME = sTime
+                TIME = sTime #on associe la nouvelle valeur a la global pour pouvoir faire le calcul suivant
             
-            id = CURRENT_ID +3
-            DATA.append([USER,TECHNIQUE,id,temps,CLICKS]) # TOUTES INFO A RENTRER / TODO: pas sur pour le ID
+            id = CURRENT_ID +3 #pour obtenir un valeur cohérente avec l'ennoncé
+            DATA.append([USER,TECHNIQUE,id,temps,CLICKS]) # stockage des données pour le dernier clique
 
-            NB_CLICK +=1
-            IND_POINTING_SPHERE = SEQUENCE_IND[SEQUENCE_CURRENT_IND]
+            NB_CLICK +=1 # afin de savoire quand s'arreter
+            IND_POINTING_SPHERE = SEQUENCE_IND[SEQUENCE_CURRENT_IND] #definit la prochaine sphère a séléctionner 
             SEQUENCE_CURRENT_IND += 1
             if SEQUENCE_CURRENT_IND > 9:
                 SEQUENCE_CURRENT_IND = 0
-                defineID() ##################################################################### ICI l'ID change faut stopper avant
+                defineID() 
     else:
-        enregistrementDonees(DATA)
-        print("Félicitation vous avez fait 270 clicks !\n Vos données ont bien été enregistré")
-        stopApplication()
+        enregistrementDonees(DATA) #envoie les données pour les enrgistrer
+        print("Félicitation vous avez fait 270 clicks !\n Vos données ont bien été enregistré") #message de fin
+        stopApplication() #arrète l'application
 
 
 
@@ -333,22 +333,23 @@ def defineID():
     global NB_SEQUENCE_IDS
     global CURRENT_ID
  
+    
     randomID = random.choice(ID_TODO) #choisie un id aléatoire dans ceux restant
     CURRENT_ID = randomID
-    ID_TODO.remove(randomID)
-    ind_radius = IDS[randomID]
-    RADIUS_CIRCLE = ind_radius[0]
+    ID_TODO.remove(randomID) #enlève de la liste l'id séléctionner pour pouvoir séléctionner uniqment les autres
+    ind_radius = IDS[randomID] #récupère les données correspondant a l'id
+    RADIUS_CIRCLE = ind_radius[0] #et les associes aux prpopriétés des sphères avant de les réafficher
     RADIUS_SPHERE = ind_radius[1]
     spheres = create_spheres()
     NB_SEQUENCE_IDS += 1
-    if len(ID_TODO) == 0:
+    if len(ID_TODO) == 0: # si il n'y a plsu rien dans la liste des id on en reimplémente une
         ID_TODO = [0, 1, 2]
-        if NB_SEQUENCE_IDS == 15:
+        if NB_SEQUENCE_IDS == 15: #change de technique au bout des 15 sequences
             newTechnique()
 
 def newTechnique():       
     global TECHNIQUE
-    TECHNIQUE = "normale" if TECHNIQUE == "bubble" else "bubble"
+    TECHNIQUE = "normale" if TECHNIQUE == "bubble" else "bubble" # inverse la technique séléctionné 
 
   
 def interactionsNearest():
@@ -356,7 +357,7 @@ def interactionsNearest():
     global IND_POINTING_SPHERE
     global IND_CURRENT_POINTING_SPHERE
     global CLICKS
-    if IND_CURRENT_POINTING_SPHERE == IND_POINTING_SPHERE:
+    if IND_CURRENT_POINTING_SPHERE == IND_POINTING_SPHERE: # si la sphère est la plus proche est celle voulue renvoie true sinon else
         CLICKS = True
     else:
         CLICKS = False
@@ -366,20 +367,20 @@ def clickOnSphere(mouse,indexSphere):
     global spheres
     global camera
     global CLICKS
-    sph = spheres[indexSphere].project(camera)
-    hyp = math.hypot(sph[0][0]-mouse[0], sph[0][1]-mouse[1])
-    if (hyp > sph[1]):
+    sph = spheres[indexSphere].project(camera) #récupère la sphère ciblé projeté
+    hyp = math.hypot(sph[0][0]-mouse[0], sph[0][1]-mouse[1]) #on calcul la distance entre la souris et le centre de la sphère
+    if (hyp > sph[1]): #si la distance entre le centre de la sphère et le souris est supérieur au rayon de la sphère
         CLICKS = False
     else :
         CLICKS = True
-    NextPointedSphere()
+    NextPointedSphere() #cherche le point suivant et permet le stockage des données
 
 def applyPointageTechnique():
     global TECHNIQUE
     global IND_CURRENT_POINTING_SPHERE
     global IND_POINTING_SPHERE
     global mouse
-    if TECHNIQUE == "bubble":
+    if TECHNIQUE == "bubble": #séléctionne le trype de technique actellment utilisé
         IND_CURRENT_POINTING_SPHERE == closest_sphere(spheres, camera, mouse)
         display_bubble(spheres[IND_CURRENT_POINTING_SPHERE], mouse, [0, 2, 0, .2])
         interactionsNearest()
@@ -407,7 +408,7 @@ print("Commands:")
 print("\ta:\tanimation")
 print("\tesc:\texit")
 print("le timer démarra à partir du premier click")
-USER = input("veuillez entrer votre nom :")
+USER = input("veuillez entrer votre nom :") #récupère le nom de l'utilisateur
 
 # initialisation
 defineID()
