@@ -199,7 +199,7 @@ def display():
     
     ###############
     #Frame
-    display_frame()
+    #display_frame()
     display_scene(spheres)
     global IND_CURRENT_POINTING_SPHERE
     IND_CURRENT_POINTING_SPHERE = closest_sphere(spheres, camera, mouse)
