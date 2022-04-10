@@ -41,6 +41,7 @@ NB_SEQUENCE_IDS = 1                             #5 sequence pour chaque ID par t
 IDS = [[3.5, 0.5], [3.75, 0.25], [4.65, 0.15]]  #ID[RAYON grande cercle, rayon Sphere] | ordre => 3, 4, 5 | formule => ID = log2((De/WE) +1) => ID = log2(2^ID)
 NEW_ID = True
 ID_TODO = [0, 1, 2] #3, 4, 5
+CURRENT_ID
 CLICK = False
 TECHNIQUE = "normale" if random.randint(1, 2) == 1 else "bubble"   
 SPHERE_CLICKED_CORRECT = False
@@ -308,7 +309,7 @@ def randomizePointedSphere():
         SEQUENCE_CURRENT_IND += 1
         if SEQUENCE_CURRENT_IND > 9:
             SEQUENCE_CURRENT_IND = 0
-            defineID()
+            defineID() ##################################################################### ICI l'ID change faut stopper avant
         
 def defineID():
     global RADIUS_CIRCLE
@@ -316,8 +317,10 @@ def defineID():
     global spheres
     global ID_TODO
     global NB_SEQUENCE_IDS
+    global CURRENT_ID
  
-    randomID = random.choice(ID_TODO)
+    randomID = random.choice(ID_TODO) #choisie un id aléatoire dans ceux restant
+    CURRENT_ID = randomID
     ID_TODO.remove(randomID)
     ind_radius = IDS[randomID]
     RADIUS_CIRCLE = ind_radius[0]
