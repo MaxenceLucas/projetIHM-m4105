@@ -39,12 +39,10 @@ SEQUENCE_IND = [2, 6, 0, 4, 8, 3, 9, 5, 1, 7]
 SEQUENCE_CURRENT_IND = 0
 NB_SEQUENCE_IDS = 0                             #5 sequence pour chaque ID par technique
 IDS = [[3.5, 0.5], [3.75, 0.25], [4.65, 0.15]]  #ID[RAYON grande cercle, rayon Sphere] | ordre => 3, 4, 5 | formule => ID = log2((De/WE) +1) => ID = log2(2^ID)
-NEW_ID = True
 ID_TODO = [0, 1, 2] #3, 4, 5
 CURRENT_ID = 0
 CLICK = False
 TECHNIQUE = "normale" if random.randint(1, 2) == 1 else "bubble"   
-SPHERE_CLICKED_CORRECT = False
 TIME = 0
 USER = ""
 DATA = []                           
@@ -265,7 +263,6 @@ def mouse_clicks(button, state, x, y):
     state is in [GLUT_DOWN, GLUT_UP]
     '''
     global mouse
-    #global NB_CLICK
     global CLICK
     CLICK = not(CLICK)      #True quand presser et faux quand
     mouse = [x, y]
@@ -290,11 +287,10 @@ def mouse_passive(x, y):
 
 ###############################################################################
 # PROJET AJOUT 
-def randomizePointedSphere():
+def NextPointedSphere():
     global IND_POINTING_SPHERE
     global SEQUENCE_CURRENT_IND
     global SEQUENCE_IND
-    global NEW_ID
     global NB_CLICK
     global CLICK
     global TIME
@@ -313,8 +309,7 @@ def randomizePointedSphere():
                 TIME = sTime
             
             id = CURRENT_ID +3
-            print(NB_CLICK)
-            DATA.append([USER,TECHNIQUE,CURRENT_ID,temps,CLICKS]) # TOUTES INFO A RENTRER / TODO: pas sur pour le ID
+            DATA.append([USER,TECHNIQUE,id,temps,CLICKS]) # TOUTES INFO A RENTRER / TODO: pas sur pour le ID
 
             NB_CLICK +=1
             IND_POINTING_SPHERE = SEQUENCE_IND[SEQUENCE_CURRENT_IND]
@@ -348,11 +343,7 @@ def defineID():
     NB_SEQUENCE_IDS += 1
     if len(ID_TODO) == 0:
         ID_TODO = [0, 1, 2]
-        
-        print("NB :" )
-        print(NB_SEQUENCE_IDS)
         if NB_SEQUENCE_IDS == 15:
-            print("test")
             newTechnique()
 
 def newTechnique():       
@@ -365,13 +356,11 @@ def interactionsNearest():
     global IND_POINTING_SPHERE
     global IND_CURRENT_POINTING_SPHERE
     global CLICKS
-    #print()
     if IND_CURRENT_POINTING_SPHERE == IND_POINTING_SPHERE:
         CLICKS = True
     else:
         CLICKS = False
-    #print(IND_CURRENT_POINTING_SPHERE, IND_POINTING_SPHERE)
-    randomizePointedSphere()
+    NextPointedSphere()
 
 def clickOnSphere(mouse,indexSphere):
     global spheres
@@ -383,7 +372,7 @@ def clickOnSphere(mouse,indexSphere):
         CLICKS = False
     else :
         CLICKS = True
-    randomizePointedSphere()
+    NextPointedSphere()
 
 def applyPointageTechnique():
     global TECHNIQUE
@@ -422,7 +411,6 @@ USER = input("veuillez entrer votre nom :")
 
 # initialisation
 defineID()
-enregistrementDonees([['Maxence', 'BUBLE', '5', '2', '0'], ['CELIAN', 'BUBLE', '5', '2', '0']])
 
 glutInit(sys.argv)
 glutInitDisplayString(b'double rgba depth')
