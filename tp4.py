@@ -45,7 +45,8 @@ CLICK = False
 TECHNIQUE = "normale" if random.randint(1, 2) == 1 else "bubble"   
 SPHERE_CLICKED_CORRECT = False
 TIME = 0
-USER = ""                            
+USER = ""
+DATA = []                           
 ################################################################################
 # SETUPS
 
@@ -266,7 +267,6 @@ def mouse_clicks(button, state, x, y):
     #global NB_CLICK
     global CLICK
     CLICK = not(CLICK)      #True quand presser et faux quand
-    #NB_CLICK += 1
     mouse = [x, y]
     applyPointageTechnique()
     glutPostRedisplay()
@@ -298,17 +298,33 @@ def randomizePointedSphere():
     global CLICK
     global TIME
     global ID_TODO
-    if CLICK == True:
+    global DATA
+    if CLICK == True and NB_CLICK <= 270:
         glFinish()
         sTime = glutGet(GLUT_ELAPSED_TIME)
-        temps = sTime - TIME #variable a récupérer pour le temps entre les deux click
-        #enregistrementDonees([USER, TECHNIQUE, ID_TODO, temps, CLICKS]) # TOUTES INFO A RENTRER / TODO: pas sur pour le ID
-        TIME = sTime
+        if (NB_CLICK == 0):
+            glFinish()
+            TIME = glutGet(GLUT_ELAPSED_TIME)
+            temps = 0
+        else:
+            temps = sTime - TIME #variable a récupérer pour le temps entre les deux click
+            TIME = sTime
+        
+        DATA.append([USER, TECHNIQUE, ID_TODO, temps, CLICKS]) # TOUTES INFO A RENTRER / TODO: pas sur pour le ID
+
+        NB_CLICK +=1
         IND_POINTING_SPHERE = SEQUENCE_IND[SEQUENCE_CURRENT_IND]
         SEQUENCE_CURRENT_IND += 1
         if SEQUENCE_CURRENT_IND > 9:
             SEQUENCE_CURRENT_IND = 0
             defineID()
+    else:
+        enregistrementDonees(DATA)
+        print("Félicitation vous avez fait 270 clicks !\n Vos données ont bien été enregistré")
+        stopApplication()
+
+
+
         
 def defineID():
     global RADIUS_CIRCLE
@@ -394,6 +410,7 @@ print("\ta:\tanimation")
 print("\tesc:\texit")
 print("le timer démarra à partir du premier click")
 USER = input("veuillez entrer votre nom :")
+
 # initialisation
 defineID()
 enregistrementDonees([['Maxence', 'BUBLE', '5', '2', '0'], ['CELIAN', 'BUBLE', '5', '2', '0']])
@@ -403,8 +420,6 @@ glutInitDisplayString(b'double rgba depth')
 glutInitWindowSize (800, 600)
 glutInitWindowPosition (0, 0)
 glutCreateWindow(b'Bubble')
-glFinish()
-TIME = glutGet(GLUT_ELAPSED_TIME)
 
 setupScene()
 
