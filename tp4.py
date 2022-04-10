@@ -37,11 +37,11 @@ IND_POINTING_SPHERE = 0
 IND_CURRENT_POINTING_SPHERE = 0
 SEQUENCE_IND = [2, 6, 0, 4, 8, 3, 9, 5, 1, 7]
 SEQUENCE_CURRENT_IND = 0
-NB_SEQUENCE_IDS = 1                             #5 sequence pour chaque ID par technique
+NB_SEQUENCE_IDS = 0                             #5 sequence pour chaque ID par technique
 IDS = [[3.5, 0.5], [3.75, 0.25], [4.65, 0.15]]  #ID[RAYON grande cercle, rayon Sphere] | ordre => 3, 4, 5 | formule => ID = log2((De/WE) +1) => ID = log2(2^ID)
 NEW_ID = True
 ID_TODO = [0, 1, 2] #3, 4, 5
-CURRENT_ID
+CURRENT_ID = 0
 CLICK = False
 TECHNIQUE = "normale" if random.randint(1, 2) == 1 else "bubble"   
 SPHERE_CLICKED_CORRECT = False
@@ -298,27 +298,30 @@ def randomizePointedSphere():
     global NB_CLICK
     global CLICK
     global TIME
-    global ID_TODO
+    global CURRENT_ID
     global DATA
-    if CLICK == True and NB_CLICK <= 270:
-        glFinish()
-        sTime = glutGet(GLUT_ELAPSED_TIME)
-        if (NB_CLICK == 0):
+    if NB_CLICK < 270:
+        if CLICK == True :
             glFinish()
-            TIME = glutGet(GLUT_ELAPSED_TIME)
-            temps = 0
-        else:
-            temps = sTime - TIME #variable a récupérer pour le temps entre les deux click
-            TIME = sTime
-        
-        DATA.append([USER, TECHNIQUE, ID_TODO, temps, CLICKS]) # TOUTES INFO A RENTRER / TODO: pas sur pour le ID
+            sTime = glutGet(GLUT_ELAPSED_TIME)
+            if NB_CLICK == 0:
+                glFinish()
+                TIME = glutGet(GLUT_ELAPSED_TIME)
+                temps = 0
+            else:
+                temps = sTime - TIME #variable a récupérer pour le temps entre les deux click
+                TIME = sTime
+            
+            id = CURRENT_ID +3
+            print(NB_CLICK)
+            DATA.append([USER,TECHNIQUE,CURRENT_ID,temps,CLICKS]) # TOUTES INFO A RENTRER / TODO: pas sur pour le ID
 
-        NB_CLICK +=1
-        IND_POINTING_SPHERE = SEQUENCE_IND[SEQUENCE_CURRENT_IND]
-        SEQUENCE_CURRENT_IND += 1
-        if SEQUENCE_CURRENT_IND > 9:
-            SEQUENCE_CURRENT_IND = 0
-            defineID() ##################################################################### ICI l'ID change faut stopper avant
+            NB_CLICK +=1
+            IND_POINTING_SPHERE = SEQUENCE_IND[SEQUENCE_CURRENT_IND]
+            SEQUENCE_CURRENT_IND += 1
+            if SEQUENCE_CURRENT_IND > 9:
+                SEQUENCE_CURRENT_IND = 0
+                defineID() ##################################################################### ICI l'ID change faut stopper avant
     else:
         enregistrementDonees(DATA)
         print("Félicitation vous avez fait 270 clicks !\n Vos données ont bien été enregistré")
@@ -342,16 +345,19 @@ def defineID():
     RADIUS_CIRCLE = ind_radius[0]
     RADIUS_SPHERE = ind_radius[1]
     spheres = create_spheres()
+    NB_SEQUENCE_IDS += 1
     if len(ID_TODO) == 0:
         ID_TODO = [0, 1, 2]
-        NB_SEQUENCE_IDS += 1
-        newTechnique()
+        
+        print("NB :" )
+        print(NB_SEQUENCE_IDS)
+        if NB_SEQUENCE_IDS == 15:
+            print("test")
+            newTechnique()
 
 def newTechnique():       
-    global ID_TODO
     global TECHNIQUE
-    if NB_SEQUENCE_IDS > 1:
-        TECHNIQUE = "normale" if TECHNIQUE == "bubble" else "bubble"
+    TECHNIQUE = "normale" if TECHNIQUE == "bubble" else "bubble"
 
   
 def interactionsNearest():
